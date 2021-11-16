@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <array>
+#include <iostream>
 #include <vector>
 
 namespace vack {
@@ -40,7 +41,20 @@ public:
     return true;
   }
 
-  Value &stackTop() { return stack[m_stackSize-1]; }
+  std::optional<Value> stackTop() {
+    if (m_stackSize > 0) {
+      return stack[m_stackSize - 1];
+    }
+    return {};
+  }
+
+  bool stackPop() {
+    if (m_stackSize > 0) {
+      --m_stackSize;
+      return true;
+    }
+    return false;
+  }
 };
 
 } // namespace vack

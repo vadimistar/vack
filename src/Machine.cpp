@@ -14,11 +14,21 @@ void Machine::executeInstr() {
       isHalt = true;
       break;
     case Instruction::Print:
-      std::cout << stackTop() << '\n';  
+      if (const auto val {stackTop()}; val) {
+        std::cout << val.value() << '\n';  
+      } else {
+        std::cerr << "Vack: Stack underflow\n";   
+      }
       break;
     case Instruction::Push:
       if (!stackPush(instr.operand)) {
         std::cerr << "Vack: Stack overflow\n";
+        exit(1);
+      }
+      break;
+    case Instruction::Pop:
+      if (!stackPop()) {
+        std::cerr << "Vack: Stack underflow\n";
         exit(1);
       }
       break;
