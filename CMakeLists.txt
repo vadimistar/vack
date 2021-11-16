@@ -8,7 +8,7 @@ project(vack LANGUAGES CXX VERSION 0.1)
 add_subdirectory("src")
 
 if (NOT MSVC) 
-  target_compile_options(vack PRIVATE -Wall -Wextra -Wshadow -Wunreachable-code -Wpedantic)
+  target_compile_options(vack PRIVATE -Wall -Wextra -Wshadow -Wunreachable-code -Wpedantic -fno-exceptions)
 endif()
 
 target_include_directories(vack PUBLIC ${PROJECT_BINARY_DIR})
