@@ -34,21 +34,21 @@ public:
 
   void executeInstr();
 
-  bool stackPush(Value t_val) {
+  [[nodiscard]] bool stackPush(Value t_val) {
     if (m_stackSize >= stackCapacity) { return false; }  
     stack[m_stackSize] = t_val;
     ++m_stackSize;
     return true;
   }
 
-  std::optional<Value> stackTop() {
+  [[nodiscard]] std::optional<Value> stackTop() {
     if (m_stackSize > 0) {
       return stack[m_stackSize - 1];
     }
     return {};
   }
 
-  bool stackPop() {
+  [[nodiscard]] bool stackPop() {
     if (m_stackSize > 0) {
       --m_stackSize;
       return true;

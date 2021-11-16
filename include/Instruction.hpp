@@ -7,7 +7,7 @@ namespace vack {
 
 struct Instruction {
   enum Kind {
-    Nop, Push, Halt, Print, Pop,  
+    Nop, Push, Halt, Print, Pop, Add, Sub,  
   };
   
   Kind kind;
