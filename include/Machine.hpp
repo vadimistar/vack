@@ -1,13 +1,14 @@
 #ifndef VACK_MACHINE_HPP
 #define VACK_MACHINE_HPP
 
-#include "Value.hpp"
 #include "Instruction.hpp"
+#include "Value.hpp"
 
-#include <cstdint>
 #include <array>
+#include <cstdint>
 #include <iostream>
 #include <vector>
+#include <optional>
 
 namespace vack {
 
@@ -24,31 +25,33 @@ private:
   decltype(stack)::size_type m_stackSize{0};
 
 public:
-  Machine(std::initializer_list<Instruction> t_instructions)
+  explicit Machine(std::initializer_list<Instruction> t_instructions)
       : instructions(t_instructions), m_it(instructions.cbegin()) {}
 
-  const auto &currentInstr() const { return *m_it; }
-  const auto &getInstr() {
+  [[nodiscard]] auto currentInstr() const -> const auto & { return *m_it; }
+  auto getInstr() -> const auto & {
     return m_it != instructions.end() ? *(m_it++) : instructions.back();
   }
 
   void executeInstr();
 
-  [[nodiscard]] bool stackPush(Value t_val) {
-    if (m_stackSize >= stackCapacity) { return false; }  
+  [[nodiscard]] auto stackPush(Value t_val) -> bool {
+    if (m_stackSize >= stackCapacity) {
+      return false;
+    }
     stack[m_stackSize] = t_val;
     ++m_stackSize;
     return true;
   }
 
-  [[nodiscard]] std::optional<Value> stackTop() {
+  [[nodiscard]] auto stackTop() -> std::optional<Value> {
     if (m_stackSize > 0) {
       return stack[m_stackSize - 1];
     }
     return {};
   }
 
-  [[nodiscard]] bool stackPop() {
+  [[nodiscard]] auto stackPop() -> bool {
     if (m_stackSize > 0) {
       --m_stackSize;
       return true;

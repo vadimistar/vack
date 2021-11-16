@@ -6,10 +6,19 @@
 namespace vack {
 
 struct Instruction {
-  enum Kind {
-    Nop, Push, Halt, Printi, Printu, Printf, Printp, Pop, Add, Sub,  
+  enum struct Kind {
+    Nop,
+    Push,
+    Halt,
+    Printi,
+    Printu,
+    Printf,
+    Printp,
+    Pop,
+    Add,
+    Sub,
   };
-  
+
   Kind kind;
   Value operand{0};
 };

@@ -1,18 +1,21 @@
 #include "../include/Machine.hpp"
 
+#include <bit>
 #include <iostream>
+#include <random>
 
-int main() { 
+auto main() -> int {
   using namespace vack;
-  static_assert(sizeof(void *) == sizeof(std::uint64_t), "Expected 64-bit platform"); 
+  static_assert(sizeof(void *) == sizeof(std::uint64_t),
+                "Expected 64-bit platform");
 
   Machine machine{
-    Instruction { Instruction::Push, 12 },
-    Instruction { Instruction::Print },
-    Instruction { Instruction::Halt },
+      {Instruction::Kind::Push, 10}, {Instruction::Kind::Push, 130},
+      {Instruction::Kind::Add},      {Instruction::Kind::Printu},
+      {Instruction::Kind::Halt},
   };
-  
+
   while (!machine.isHalt) {
-    machine.executeInstr(); 
+    machine.executeInstr();
   }
 }
