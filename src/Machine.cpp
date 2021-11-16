@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <bit>
 
 namespace vack {
 
@@ -23,10 +24,32 @@ void Machine::executeInstr() {
     case Instruction::Halt:
       isHalt = true;
       break;
-    case Instruction::Print:
+    case Instruction::Printi:
+      if (const auto val {stackTop()}; val) {
+        std::cout << std::bit_cast<std::int64_t>(val.value()) << '\n';  
+      } else {
+        stackUnderflow();
+      }
+      break;
+    case Instruction::Printu:
       if (const auto val {stackTop()}; val) {
         std::cout << val.value() << '\n';  
       } else {
+        stackUnderflow();
+      }
+      break;
+    case Instruction::Printf:
+      if (const auto val {stackTop()}; val) {
+        std::cout << std::bit_cast<double>(val.value()) << '\n';  
+      } else {
+        stackUnderflow();
+      }
+      break;
+    case Instruction::Printp:
+      if (const auto val{ stackTop() }; val) {
+        std::cout << std::bit_cast<void *>(val.value()) << '\n'; 
+      }
+      else {
         stackUnderflow();
       }
       break;
@@ -41,17 +64,17 @@ void Machine::executeInstr() {
       }
       break;
     case Instruction::Add: {
-        const auto lhs { stackTop() };
-        if (!stackPop()) { stackUnderflow(); }
         const auto rhs { stackTop() };
+        if (!stackPop()) { stackUnderflow(); }
+        const auto lhs { stackTop() };
         if (!stackPop()) { stackUnderflow(); }
         if (!stackPush(lhs.value() + rhs.value())) { stackOverflow(); }
       }
       break;
     case Instruction::Sub: {
-        const auto lhs { stackTop() };
-        if (!stackPop()) { stackUnderflow(); }
         const auto rhs { stackTop() };
+        if (!stackPop()) { stackUnderflow(); }
+        const auto lhs { stackTop() };
         if (!stackPop()) { stackUnderflow(); }
         if (!stackPush(lhs.value() - rhs.value())) { stackOverflow(); }
       }
