@@ -7,8 +7,8 @@
 #include <array>
 #include <cstdint>
 #include <iostream>
-#include <vector>
 #include <optional>
+#include <vector>
 
 namespace vack {
 

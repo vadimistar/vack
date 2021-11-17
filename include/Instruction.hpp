@@ -15,8 +15,12 @@ struct Instruction {
     Printf,
     Printp,
     Pop,
-    Add,
-    Sub,
+    Addi,
+    Addu,
+    Addf,
+    Subi,
+    Subu,
+    Subf,
   };
 
   Kind kind;

@@ -33,6 +33,21 @@ void Machine::executeInstr() {
     return val.value();
   };
 
+  const auto executeAdd = [this, &getStackPop,
+                           &stackOverflow](const auto casting) {
+    if (!stackPush(std::bit_cast<Value>(casting(getStackPop()) + casting(getStackPop())))) {
+      stackOverflow();
+    }
+  };
+
+  const auto executeSub = [this, &getStackPop,
+                           &stackOverflow](const auto casting) {
+    const auto rhs = casting(getStackPop());
+    if (!stackPush(std::bit_cast<Value>(casting(getStackPop()) - rhs))) {
+      stackOverflow();
+    }
+  };
+
   const auto instr = getInstr();
 
   switch (instr.kind) {
@@ -48,7 +63,7 @@ void Machine::executeInstr() {
     std::cout << getStackTop() << '\n';
     break;
   case Instruction::Kind::Printf:
-    std::cout << std::bit_cast<double>(getStackTop()) << '\n';
+    std::cout << std::bit_cast<std::double_t>(getStackTop()) << '\n';
     break;
   case Instruction::Kind::Printp:
     std::cout << std::bit_cast<void *>(getStackTop()) << '\n';
@@ -63,17 +78,24 @@ void Machine::executeInstr() {
       stackUnderflow();
     }
     break;
-  case Instruction::Kind::Add:
-    if (!stackPush(getStackPop() + getStackPop())) {
-      stackOverflow();
-    }
+  case Instruction::Kind::Addi:
+    executeAdd([](Value v) { return std::bit_cast<std::int64_t>(v); });
     break;
-  case Instruction::Kind::Sub: {
-    const auto rhs = getStackPop();
-    if (!stackPush(getStackPop() - rhs)) {
-      stackOverflow();
-    }
-  } break;
+  case Instruction::Kind::Addu:
+    executeAdd([](Value v) { return v; });
+    break;
+  case Instruction::Kind::Addf:
+    executeAdd([](Value v) { return std::bit_cast<std::double_t>(v); });
+    break;
+  case Instruction::Kind::Subi:
+    executeSub([](Value v) { return std::bit_cast<std::int64_t>(v); });
+    break;
+  case Instruction::Kind::Subu:
+    executeSub([](Value v) { return v; });
+    break;
+  case Instruction::Kind::Subf:
+    executeSub([](Value v) { return std::bit_cast<std::double_t>(v); });
+    break;
   default:
     assert(0 && "this kind of instruction is not handled");
   }
