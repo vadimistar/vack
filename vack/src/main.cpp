@@ -12,7 +12,7 @@ auto main() -> int {
       {Instruction::Kind::Push, std::bit_cast<Value>(0.9)},
       {Instruction::Kind::Push, std::bit_cast<Value>(1.30)},
       {Instruction::Kind::Subf},
-      {Instruction::Kind::Printf},
+      {Instruction::Kind::Logf},
       {Instruction::Kind::Halt},
   };
 

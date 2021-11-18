@@ -56,16 +56,16 @@ void Machine::executeInstr() {
   case Instruction::Kind::Halt:
     isHalt = true;
     break;
-  case Instruction::Kind::Printi:
+  case Instruction::Kind::Logi:
     std::cout << std::bit_cast<std::int64_t>(getStackTop()) << '\n';
     break;
-  case Instruction::Kind::Printu:
+  case Instruction::Kind::Logu:
     std::cout << getStackTop() << '\n';
     break;
-  case Instruction::Kind::Printf:
+  case Instruction::Kind::Logf:
     std::cout << std::bit_cast<std::double_t>(getStackTop()) << '\n';
     break;
-  case Instruction::Kind::Printp:
+  case Instruction::Kind::Logp:
     std::cout << std::bit_cast<void *>(getStackTop()) << '\n';
     break;
   case Instruction::Kind::Push:
