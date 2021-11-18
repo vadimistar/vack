@@ -1,13 +1,13 @@
-   push 3
+push 3
 push 8
 addu
-printu
+logu
 push -5
 push 15
 addi
-printi
+logi
 push 4.5
 push -5.8
 addf
-printf
+logf
 halt
