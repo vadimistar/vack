@@ -1,6 +1,7 @@
 #ifndef VACK_VKASM_BYTECODECREATOR_HPP
 #define VACK_VKASM_BYTECODECREATOR_HPP
 
+#include "../../vack/include/Instruction.hpp"
 #include "Lexer.hpp"
 #include <vector>
 
@@ -8,6 +9,10 @@ namespace vack::vkasm {
 
 class BytecodeCreator {
   std::vector<Token> tokens;
+
+  static auto getInstruction(std::string_view /*instr*/) -> Instruction::Kind;
+  static auto getArgumentsCount(Instruction::Kind /*kind*/) -> std::uint16_t;
+  static auto getVackValue(const Token & /*token*/) -> Value;
 
 public:
   explicit BytecodeCreator(Lexer &t_lexer) {
@@ -19,6 +24,8 @@ public:
       tokens.emplace_back(token);
     }
   }
+
+  auto createAndWrite(std::ostream & /*out*/) -> void;
 };
 
 } // namespace vack::vkasm
