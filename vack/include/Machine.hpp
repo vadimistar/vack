@@ -25,8 +25,8 @@ private:
   decltype(stack)::size_type m_stackSize{0};
 
 public:
-  explicit Machine(std::initializer_list<Instruction> t_instructions)
-      : instructions(t_instructions), m_it(instructions.cbegin()) {}
+  explicit Machine(std::vector<Instruction> &&t_instructions)
+      : instructions(std::move(t_instructions)), m_it(instructions.cbegin()) {}
 
   [[nodiscard]] auto currentInstr() const -> const auto & { return *m_it; }
   auto getInstr() -> const auto & {

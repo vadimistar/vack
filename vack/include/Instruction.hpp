@@ -2,12 +2,13 @@
 #define VACK_INSTRUCTION_HPP
 
 #include "Value.hpp"
+#include <cstdint>
 
 namespace vack {
 
 struct Instruction {
   enum struct Kind {
-    Null, 
+    Null,
     Nop,
     Push,
     Halt,
@@ -26,6 +27,15 @@ struct Instruction {
 
   Kind kind;
   Value operand{0};
+
+  auto getArgumentsCount() -> std::uint16_t {
+    switch (kind) {
+    case Instruction::Kind::Push:
+      return 1;
+    default:
+      return 0;
+    }
+  }
 };
 
 } // namespace vack

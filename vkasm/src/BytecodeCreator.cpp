@@ -1,9 +1,10 @@
 #include "../include/BytecodeCreator.hpp"
+#include "../../vack/include/Instruction.hpp"
 #include "../include/Log.hpp"
 
-#include <map>
 #include <cassert>
 #include <iomanip>
+#include <map>
 
 namespace vack::vkasm {
 
@@ -24,16 +25,6 @@ auto BytecodeCreator::getInstruction(std::string_view instr)
   return Instruction::Kind::Null;
 }
 
-auto BytecodeCreator::getArgumentsCount(Instruction::Kind kind)
-    -> std::uint16_t {
-  switch (kind) {
-  case Instruction::Kind::Push:
-    return 1;
-  default:
-    return 0;
-  }
-}
-
 auto BytecodeCreator::createAndWrite(std::ostream &out) -> void {
   if (tokens.empty()) {
     return;
@@ -47,7 +38,7 @@ auto BytecodeCreator::createAndWrite(std::ostream &out) -> void {
     error(tokens[0].location) << "unknown instruction\n";
     exit(1);
   }
-  if (const auto argsCount = getArgumentsCount(instrKind);
+  if (const auto argsCount = Instruction{instrKind}.getArgumentsCount();
       argsCount != tokens.size() - 1) {
     error(tokens[0].location)
         << "invalid number or arguments, expected " << argsCount << ", but got "
@@ -56,24 +47,31 @@ auto BytecodeCreator::createAndWrite(std::ostream &out) -> void {
   }
   out << static_cast<std::uint8_t>(instrKind);
 
-  constexpr auto valueWidth = 8u * 2u;
-
   for (auto i = tokens.begin() + 1; i != tokens.end(); ++i) {
-    out << std::setw(valueWidth) << std::setfill('0') << std::hex << getVackValue(*i);  
+    const auto value = getVackValue(*i);
+    const auto b1 = static_cast<unsigned char>(value &  0x00000000000000ff);
+    const auto b2 = static_cast<unsigned char>((value & 0x000000000000ff00) >> 8);
+    const auto b3 = static_cast<unsigned char>((value & 0x0000000000ff0000) >> 16);
+    const auto b4 = static_cast<unsigned char>((value & 0x00000000ff000000) >> 24); 
+    const auto b5 = static_cast<unsigned char>((value & 0x000000ff00000000) >> 32);
+    const auto b6 = static_cast<unsigned char>((value & 0x0000ff0000000000) >> 40);
+    const auto b7 = static_cast<unsigned char>((value & 0x00ff000000000000) >> 48);
+    const auto b8 = static_cast<unsigned char>((value & 0xff00000000000000) >> 56); 
+    out << b1 << b2 << b3 << b4 << b5 << b6 << b7 << b8;
   }
 }
 
 auto BytecodeCreator::getVackValue(const Token &token) -> Value {
   switch (token.kind) {
-  
+
   case Token::Kind::Null:
-    assert(false &&"got null token while creating bytecode");
+    assert(false && "got null token while creating bytecode");
     break;
   case Token::Kind::Word:
     error(token.location) << "expected float or integer literal\n";
     exit(1);
   case Token::Kind::Integer:
-    return std::bit_cast<Value>(std::stoll(token.value)); 
+    return std::bit_cast<Value>(std::stoll(token.value));
   case Token::Kind::Float:
     return std::bit_cast<Value>(std::stod(token.value));
   default:

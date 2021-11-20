@@ -11,7 +11,6 @@ namespace vack::vkasm {
 class BytecodeCreator {
   std::vector<Token> tokens;
   static auto getInstruction(std::string_view instr) -> Instruction::Kind;
-  static auto getArgumentsCount(Instruction::Kind kind) -> std::uint16_t; 
   static auto getVackValue(const Token &token) -> Value; 
 
 public:
