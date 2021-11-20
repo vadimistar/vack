@@ -54,7 +54,7 @@ auto BytecodeCreator::createAndWrite(std::ostream &out) -> void {
         << tokens.size() - 1 << '\n';
     exit(1);
   }
-  out << static_cast<std::uint8_t>(tokens[0].kind);
+  out << static_cast<std::uint8_t>(instrKind);
 
   constexpr auto valueWidth = 8u * 2u;
 
