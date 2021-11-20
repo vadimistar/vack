@@ -3,3 +3,5 @@ Makefile
 .ccls
 out/
 .vs/
+.vkbc
+CMakeSettings.json

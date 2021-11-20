@@ -1,6 +1,6 @@
 push 3
 push 8
-addu
+addu 
 logu
 push -5
 push 15
