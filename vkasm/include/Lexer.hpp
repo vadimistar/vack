@@ -15,14 +15,14 @@ class Lexer {
 
   static constexpr auto commentBegin() { return ';'; }
   static auto isFirstWordSymbol(const char c) {
-    return (static_cast<bool>(std::isalpha(c)) || c == '_' || c == '.';
+    return static_cast<bool>(std::isalpha(c)) || c == '_' || c == '.';
   }
   static auto isWordSymbol(const char c) {
     return isFirstWordSymbol(c) || static_cast<bool>(std::isdigit(c));
   }
 
 public:
-  Lexer(const std::string &t_data, const Location t_loc)
+  Lexer(const std::string &t_data, Location t_loc)
       : m_data(t_data), m_it(t_data.cbegin()), m_loc(t_loc) {}
 
   [[nodiscard]] auto unparsed() const { return std::string_view{m_it, m_data.cend()}; }
