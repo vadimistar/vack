@@ -2,15 +2,11 @@
 #include "../include/BytecodeCreator.hpp"
 #include "../include/Lexer.hpp"
 
-#include <charconv>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
 
-#include <algorithm>
-#include <cassert>
-#include <map>
 #include <optional>
 #include <span>
 
@@ -92,5 +88,6 @@ auto main(int argc, char **argv) -> int {
     }
     Lexer lexer(line.value(), Location{line_number});
     BytecodeCreator creator(lexer);
+    creator.createAndWrite(output_file);
   }
 }
