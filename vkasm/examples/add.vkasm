@@ -1,13 +1,24 @@
+; addu
 push 3
 push 8
 addu 
+pop
 logu
+
+; addi
 push -5
 push 15
 addi
+pop
 logi
+
+; addf
 push 4.5
 push -5.8
 addf
+pop
 logf
+
+; TODO: introduce a way to check if the stack is empty
+
 halt
