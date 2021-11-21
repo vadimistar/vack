@@ -16,11 +16,9 @@ auto Lexer::parseNumber() -> Token {
   if (!empty() && current() == '.') {
     move();
     skipDigits();
-    return genToken(Token::Kind::Float,
-                  std::string{begin_it, m_it}, begin_loc);
+    return {Token::Kind::Float, std::string{begin_it, m_it}, begin_loc};
   }
-  return genToken(Token::Kind::Integer,
-                  std::string{begin_it, m_it}, begin_loc);
+  return {Token::Kind::Integer, std::string{begin_it, m_it}, begin_loc};
 }
 
 auto Lexer::parseWord() -> Token {
@@ -29,14 +27,13 @@ auto Lexer::parseWord() -> Token {
   while (!empty() && isWordSymbol(current())) {
     move();
   }
-  return genToken(Token::Kind::Word,
-                  std::string{begin_it, m_it}, begin_loc);
+  return {Token::Kind::Word, std::string{begin_it, m_it}, begin_loc};
 }
 
 auto Lexer::getToken() -> Token {
   const auto skipWs = [this]() {
-    while (!empty() && (static_cast<bool>(std::isblank(current())) ||
-           current() == '\r')) {
+    while (!empty() &&
+           (static_cast<bool>(std::isblank(current())) || current() == '\r')) {
       move();
     }
   };
@@ -46,7 +43,7 @@ auto Lexer::getToken() -> Token {
       m_it = m_data.cend();
     }
   };
-  skipWs(); 
+  skipWs();
   skipComment();
 
   if (!empty()) {
@@ -64,6 +61,8 @@ auto Lexer::getToken() -> Token {
     case '-':
     case '+':
       return parseNumber();
+    case ':':
+      return genToken(Token::Kind::Colon, "", m_loc);
     default:
       if (isFirstWordSymbol(current())) {
         return parseWord();
@@ -73,7 +72,7 @@ auto Lexer::getToken() -> Token {
     }
   }
 
-  return Token {
+  return Token{
       .kind = Token::Kind::Null,
       .value = "",
       .location = m_loc,

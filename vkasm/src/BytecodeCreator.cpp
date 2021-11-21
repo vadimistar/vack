@@ -8,6 +8,9 @@
 
 namespace vack::vkasm {
 
+std::uint32_t BytecodeCreator::m_instructionsTranslated{0};
+std::map<std::string, std::uint32_t> BytecodeCreator::m_labels{};
+
 auto BytecodeCreator::getInstruction(std::string_view instr)
     -> Instruction::Kind {
   static const std::map<std::string_view, Instruction::Kind> t_instrKinds{
@@ -18,7 +21,7 @@ auto BytecodeCreator::getInstruction(std::string_view instr)
       {"addi", Instruction::Kind::Addi}, {"addu", Instruction::Kind::Addu},
       {"addf", Instruction::Kind::Addf}, {"subi", Instruction::Kind::Subi},
       {"subu", Instruction::Kind::Subu}, {"subf", Instruction::Kind::Subf},
-      {"goto", Instruction::Kind::Goto}, 
+      {"goto", Instruction::Kind::Goto},
   };
   if (const auto it = t_instrKinds.find(instr); it != t_instrKinds.end()) {
     return it->second;
@@ -31,11 +34,16 @@ auto BytecodeCreator::createAndWrite(std::ostream &out) -> void {
     return;
   }
   if (tokens[0].kind != Token::Kind::Word) {
-    error(tokens[0].location) << "expected keyword\n";
+    error(tokens[0].location) << "expected keyword or identifier\n";
     exit(1);
   }
   const auto instrKind = getInstruction(tokens[0].value);
   if (instrKind == Instruction::Kind::Null) {
+    if (tokens.size() == 2 && tokens[1].kind == Token::Kind::Colon) {
+      // Label
+      m_labels[tokens[0].value] = m_instructionsTranslated;
+      return;
+    }
     error(tokens[0].location) << "unknown instruction\n";
     exit(1);
   }
@@ -50,16 +58,25 @@ auto BytecodeCreator::createAndWrite(std::ostream &out) -> void {
 
   for (auto i = tokens.begin() + 1; i != tokens.end(); ++i) {
     const auto value = getVackValue(*i);
-    const auto b1 = static_cast<unsigned char>(value &  0x00000000000000ff);
-    const auto b2 = static_cast<unsigned char>((value & 0x000000000000ff00) >> 8);
-    const auto b3 = static_cast<unsigned char>((value & 0x0000000000ff0000) >> 16);
-    const auto b4 = static_cast<unsigned char>((value & 0x00000000ff000000) >> 24); 
-    const auto b5 = static_cast<unsigned char>((value & 0x000000ff00000000) >> 32);
-    const auto b6 = static_cast<unsigned char>((value & 0x0000ff0000000000) >> 40);
-    const auto b7 = static_cast<unsigned char>((value & 0x00ff000000000000) >> 48);
-    const auto b8 = static_cast<unsigned char>((value & 0xff00000000000000) >> 56); 
+    const auto b1 = static_cast<unsigned char>(value & 0x00000000000000ff);
+    const auto b2 =
+        static_cast<unsigned char>((value & 0x000000000000ff00) >> 8);
+    const auto b3 =
+        static_cast<unsigned char>((value & 0x0000000000ff0000) >> 16);
+    const auto b4 =
+        static_cast<unsigned char>((value & 0x00000000ff000000) >> 24);
+    const auto b5 =
+        static_cast<unsigned char>((value & 0x000000ff00000000) >> 32);
+    const auto b6 =
+        static_cast<unsigned char>((value & 0x0000ff0000000000) >> 40);
+    const auto b7 =
+        static_cast<unsigned char>((value & 0x00ff000000000000) >> 48);
+    const auto b8 =
+        static_cast<unsigned char>((value & 0xff00000000000000) >> 56);
     out << b1 << b2 << b3 << b4 << b5 << b6 << b7 << b8;
   }
+
+  ++m_instructionsTranslated;
 }
 
 auto BytecodeCreator::getVackValue(const Token &token) -> Value {
@@ -69,8 +86,11 @@ auto BytecodeCreator::getVackValue(const Token &token) -> Value {
     assert(false && "got null token while creating bytecode");
     break;
   case Token::Kind::Word:
-    error(token.location) << "expected float or integer literal\n";
-    exit(1);
+    if (const auto m = m_labels.find(token.value); m != m_labels.end()) {
+      return m->second; 
+    }
+    assert(false && "forward search of labels is not implemented");
+    break;
   case Token::Kind::Integer:
     return std::bit_cast<Value>(std::stoll(token.value));
   case Token::Kind::Float:

@@ -5,6 +5,7 @@
 
 #include "Lexer.hpp"
 #include <vector>
+#include <map>
 
 namespace vack::vkasm {
 
@@ -12,6 +13,9 @@ class BytecodeCreator {
   std::vector<Token> tokens;
   static auto getInstruction(std::string_view instr) -> Instruction::Kind;
   static auto getVackValue(const Token &token) -> Value; 
+
+  static std::uint32_t m_instructionsTranslated;
+  static std::map<std::string, std::uint32_t> m_labels;
 
 public:
   explicit BytecodeCreator(Lexer &t_lexer) {
@@ -24,6 +28,12 @@ public:
     }
   }
 
+  BytecodeCreator(const BytecodeCreator &) = delete;
+  BytecodeCreator(BytecodeCreator &&) = delete;
+  BytecodeCreator &operator=(const BytecodeCreator &) = delete;
+  BytecodeCreator &operator=(BytecodeCreator &&) = delete;
+
+  // returns true if instruction was successfully translated, whitespace and syntax sugar lead to false
   auto createAndWrite(std::ostream &out) -> void;
 };
 

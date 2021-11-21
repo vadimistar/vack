@@ -1,5 +1,6 @@
 push 1
+loop:
 push 1
 addu
 logu
-goto 1
+goto loop
