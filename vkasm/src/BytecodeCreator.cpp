@@ -86,8 +86,8 @@ auto BytecodeCreator::getVackValue(const Token &token) -> Value {
     if (const auto m = labelMap.find(token.value); m != labelMap.end()) {
       return m->second;
     }
-    assert(false && "forward search of labels is not implemented");
-    break;
+    error(token.location) << "undeclared label" << '\n';
+    exit(1);
   case Token::Kind::Integer:
     return std::bit_cast<Value>(std::stoll(token.value));
   case Token::Kind::Float:

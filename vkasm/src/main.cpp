@@ -99,9 +99,9 @@ auto main(int argc, char **argv) -> int {
       break;
     }
 
-    if (tokens.back().size() == 0) {
+    if (tokens.back().empty()) {
       continue;
-    } else if (tokens.back().size() == 2 &&
+    } if (tokens.back().size() == 2 &&
                tokens.back()[0].kind == Token::Kind::Word &&
                tokens.back()[1].kind == Token::Kind::Colon) {
       labels[tokens.back()[0].value] = instructions;
