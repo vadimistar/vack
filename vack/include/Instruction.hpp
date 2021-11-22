@@ -23,6 +23,7 @@ struct Instruction {
     Subi,
     Subu,
     Subf,
+    Goto,
   };
 
   Kind kind;
@@ -31,6 +32,7 @@ struct Instruction {
   auto getArgumentsCount() -> std::uint16_t {
     switch (kind) {
     case Instruction::Kind::Push:
+    case Instruction::Kind::Goto:
       return 1;
     default:
       return 0;

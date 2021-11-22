@@ -1,0 +1,10 @@
+	goto start
+	goto end
+
+start:
+	push 1
+	goto 1
+
+end:
+	pop
+	halt

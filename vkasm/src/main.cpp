@@ -14,7 +14,7 @@ auto main(int argc, char **argv) -> int {
   const auto printHelp = []() {
     std::cout <<
         R"(vkasm HELP:
-    USAGE: vkasm <filename> [<output>]
+    USAGE: vkasm <filename> [-o <output>]
     
     <filename>  .vkasm source file
     <output>    .vkbc output bytecode file
@@ -56,8 +56,9 @@ auto main(int argc, char **argv) -> int {
     exit(1);
   }
 
-  const auto generateOutputPath = [&inputFilePath, &getArg]() {
-    if (getArg().value_or("") == "-o") {
+  const auto generateOutputPath = [&inputFilePath, &getArg, &printHelp]() {
+    const auto arg = getArg();
+    if (arg.value_or("") == "-o") {
       const auto path = std::filesystem::path{getArg().value_or("")};
       if (path.extension() != ".vkbc") {
         std::cerr
@@ -65,11 +66,14 @@ auto main(int argc, char **argv) -> int {
         exit(1);
       }
       return path;
+    } else if (!arg) {
+        return inputFilePath.replace_extension("vkbc");
     }
-    return inputFilePath.replace_extension("vkbc");
+    printHelp();
+    std::cerr << "vkasm: ERROR: Expected '-o' or end, but got " << arg.value()
+              << '\n';
+    exit(1);
   };
-
-  std::ofstream output_file(generateOutputPath(), std::ios::binary);
 
   using namespace vack::vkasm;
 
@@ -81,13 +85,60 @@ auto main(int argc, char **argv) -> int {
     return std::nullopt;
   };
 
+  std::map<std::string, std::uint32_t> labels;
+  std::vector<std::vector<Token>> tokens;
+  std::uint32_t instructions{0};
+
   for (Location::Line line_number{1}; true; ++line_number) {
     const auto line = getLine();
     if (!line) {
       break;
     }
+
     Lexer lexer(line.value(), Location{line_number});
-    BytecodeCreator creator(lexer);
-    creator.createAndWrite(output_file);
+    tokens.emplace_back();
+    while (true) {
+      if (const auto t = lexer.getToken(); t.kind != Token::Kind::Null) {
+        tokens.back().emplace_back(t);
+        continue;
+      }
+      break;
+    }
+
+    if (tokens.back().empty()) {
+      continue;
+    } if (tokens.back().size() == 2 &&
+               tokens.back()[0].kind == Token::Kind::Word &&
+               tokens.back()[1].kind == Token::Kind::Colon) {
+      labels[tokens.back()[0].value] = instructions;
+    } else {
+      ++instructions;
+    }
+  }
+
+  std::vector<std::uint8_t> bytecode;
+
+  for (auto &instrTokens : tokens) {
+    BytecodeCreator bytecodeCreator(std::move(instrTokens), labels);
+    const auto newBytes{bytecodeCreator.create()};
+    std::copy(newBytes.begin(), newBytes.end(), std::back_inserter(bytecode));
+  }
+
+  const auto outputPath = generateOutputPath();
+
+  if (it != args.end()) {
+    std::cerr << "vkasm: ERROR: Expected end of input, but got " << *it << '\n'; 
+    exit(1);
+  }
+
+  std::ofstream output_file(outputPath, std::ios::binary);
+
+  if (!output_file) {
+    std::cerr << "vkasm: ERROR: Can't open output file: " << outputPath << '\n';
+    exit(1);
+  }
+
+  for (const auto byte : bytecode) {
+    output_file << byte;
   }
 }

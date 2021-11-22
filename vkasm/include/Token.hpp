@@ -15,7 +15,7 @@ struct Location {
 };
 
 struct Token {
-  enum struct Kind { Null, Word, Integer, Float };
+  enum struct Kind { Null, Word, Integer, Float, Colon };
   Kind kind;
   std::string value;
   Location location;

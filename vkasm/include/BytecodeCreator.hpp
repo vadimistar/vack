@@ -5,26 +5,21 @@
 
 #include "Lexer.hpp"
 #include <vector>
+#include <map>
 
 namespace vack::vkasm {
 
 class BytecodeCreator {
   std::vector<Token> tokens;
+  const std::map<std::string, std::uint32_t> &labelMap;
   static auto getInstruction(std::string_view instr) -> Instruction::Kind;
-  static auto getVackValue(const Token &token) -> Value; 
+  auto getVackValue(const Token &token) -> Value; 
 
 public:
-  explicit BytecodeCreator(Lexer &t_lexer) {
-    while (true) {
-      const auto token = t_lexer.getToken();
-      if (token.kind == Token::Kind::Null) {
-        break;
-      }
-      tokens.emplace_back(token);
-    }
-  }
+  BytecodeCreator(std::vector<Token> &&t_tokens, const std::map<std::string, std::uint32_t> &t_labelMap)
+      : tokens(std::move(t_tokens)), labelMap(t_labelMap) {}
 
-  auto createAndWrite(std::ostream &out) -> void;
+  auto create() -> std::vector<std::uint8_t>;
 };
 
 } // namespace vack::vkasm

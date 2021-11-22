@@ -96,6 +96,14 @@ void Machine::executeInstr() {
   case Instruction::Kind::Subf:
     executeSub([](Value v) { return std::bit_cast<std::double_t>(v); });
     break;
+  case Instruction::Kind::Goto:
+    if (instr.operand > instructions.size()) {
+      std::cerr << "vack: ERROR: Goto got invalid index of instruction: "
+                << instr.operand << '\n';
+      exit(1);
+    }
+    m_it = instructions.cbegin() + instr.operand;
+    break;
   default:
     assert(0 && "this kind of instruction is not handled");
   }

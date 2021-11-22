@@ -15,7 +15,7 @@ public:
   
   auto getInstruction() -> Instruction;
 
-  auto isEnd() const { return src.peek() == EOF; }
+  [[nodiscard]] auto isEnd() const { return src.peek() == EOF; }
 };
 
 } // namespace vack
