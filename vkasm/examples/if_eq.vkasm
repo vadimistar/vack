@@ -1,0 +1,14 @@
+push 0
+
+loop:
+	push 1
+	addu
+	logu
+
+	dup
+	push 10000
+	if_eq end
+	goto loop
+
+end:
+	halt
