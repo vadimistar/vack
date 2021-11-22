@@ -66,7 +66,7 @@ auto main(int argc, char **argv) -> int {
         exit(1);
       }
       return path;
-    } if (!arg) {
+    } else if (!arg) {
         return inputFilePath.replace_extension("vkbc");
     }
     printHelp();
