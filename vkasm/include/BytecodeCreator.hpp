@@ -19,8 +19,7 @@ public:
   BytecodeCreator(std::vector<Token> &&t_tokens, const std::map<std::string, std::uint32_t> &t_labelMap)
       : tokens(std::move(t_tokens)), labelMap(t_labelMap) {}
 
-  // returns true if instruction was successfully translated, whitespace and syntax sugar lead to false
-  auto createAndWrite(std::ostream &out) -> void;
+  auto create() -> std::vector<std::uint8_t>;
 };
 
 } // namespace vack::vkasm

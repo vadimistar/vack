@@ -14,7 +14,7 @@ auto main(int argc, char **argv) -> int {
   const auto printHelp = []() {
     std::cout <<
         R"(vkasm HELP:
-    USAGE: vkasm <filename> [<output>]
+    USAGE: vkasm <filename> [-o <output>]
     
     <filename>  .vkasm source file
     <output>    .vkbc output bytecode file
@@ -69,8 +69,6 @@ auto main(int argc, char **argv) -> int {
     return inputFilePath.replace_extension("vkbc");
   };
 
-  std::ofstream output_file(generateOutputPath(), std::ios::binary);
-
   using namespace vack::vkasm;
 
   const auto getLine = [&inputFile]() -> std::optional<std::string> {
@@ -101,20 +99,35 @@ auto main(int argc, char **argv) -> int {
       break;
     }
 
-    if (tokens.back().size() != 0) {
-      ++instructions;
-    }
-
-    if (tokens.back().size() == 2 &&
-        tokens.back()[0].kind == Token::Kind::Word &&
-        tokens.back()[1].kind == Token::Kind::Colon) {
-      --instructions;
+    if (tokens.back().size() == 0) {
+      continue;
+    } else if (tokens.back().size() == 2 &&
+               tokens.back()[0].kind == Token::Kind::Word &&
+               tokens.back()[1].kind == Token::Kind::Colon) {
       labels[tokens.back()[0].value] = instructions;
+    } else {
+      ++instructions;
     }
   }
 
+  std::vector<std::uint8_t> bytecode;
+
   for (auto &instrTokens : tokens) {
-    BytecodeCreator bytecodeCreator(std::move(instrTokens), labels); 
-    bytecodeCreator.createAndWrite(output_file); 
+    BytecodeCreator bytecodeCreator(std::move(instrTokens), labels);
+    const auto newBytes{bytecodeCreator.create()};
+    std::copy(newBytes.begin(), newBytes.end(), std::back_inserter(bytecode));
+  }
+
+  const auto outputPath = generateOutputPath();
+
+  std::ofstream output_file(outputPath, std::ios::binary);
+
+  if (!output_file) {
+    std::cerr << "vkasm: ERROR: Can't open output file: " << outputPath << '\n';
+    exit(1);
+  }
+
+  for (const auto byte : bytecode) {
+    output_file << byte;
   }
 }
