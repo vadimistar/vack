@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <numeric>
 #include <span>
+#include <cctype>
 
 auto main(int argc, char **argv) -> int {
   using namespace vack;
@@ -28,7 +29,7 @@ auto main(int argc, char **argv) -> int {
   };
 
   const auto args =
-      std::span{argv + 1, static_cast<std::span<char *>::size_type>(argc)};
+      std::span{argv + 1, static_cast<std::span<char *>::size_type>(argc - 1)};
 
   if (argc == 1) {
     printHelp();
@@ -60,7 +61,8 @@ auto main(int argc, char **argv) -> int {
 
       auto [ptr, ec] = std::from_chars(val.data(), val.data() + val.size(),
                                        instructionsLimit);
-      if (ec == std::errc::invalid_argument) {
+
+      if (ptr != val.data() + val.size() || ec == std::errc::invalid_argument) {
         std::cerr << "vack: ERROR: Expected integer as argument for the option "
                   << arg << '\n';
         exit(1);
@@ -86,9 +88,17 @@ auto main(int argc, char **argv) -> int {
 
       Machine machine{std::move(instructions)};
 
-      while (!machine.isHalt) {
+      while (!machine.isHalt && instructionsLimit != 0) {
         machine.executeInstr();
+        --instructionsLimit;
       }
+
+      return 0;
     }
   }
+
+  printHelp();
+  std::cerr << "vack: ERROR: Input file is not specified\n";
+
+  return 1;
 }
