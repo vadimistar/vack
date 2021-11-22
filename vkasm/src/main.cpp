@@ -56,8 +56,9 @@ auto main(int argc, char **argv) -> int {
     exit(1);
   }
 
-  const auto generateOutputPath = [&inputFilePath, &getArg]() {
-    if (getArg().value_or("") == "-o") {
+  const auto generateOutputPath = [&inputFilePath, &getArg, &printHelp]() {
+    const auto arg = getArg();
+    if (arg.value_or("") == "-o") {
       const auto path = std::filesystem::path{getArg().value_or("")};
       if (path.extension() != ".vkbc") {
         std::cerr
@@ -65,8 +66,13 @@ auto main(int argc, char **argv) -> int {
         exit(1);
       }
       return path;
+    } else if (!arg) {
+        return inputFilePath.replace_extension("vkbc");
     }
-    return inputFilePath.replace_extension("vkbc");
+    printHelp();
+    std::cerr << "vkasm: ERROR: Expected '-o' or end, but got " << arg.value()
+              << '\n';
+    exit(1);
   };
 
   using namespace vack::vkasm;
@@ -119,6 +125,11 @@ auto main(int argc, char **argv) -> int {
   }
 
   const auto outputPath = generateOutputPath();
+
+  if (it != args.end()) {
+    std::cerr << "vkasm: ERROR: Expected end of input, but got " << *it << '\n'; 
+    exit(1);
+  }
 
   std::ofstream output_file(outputPath, std::ios::binary);
 
