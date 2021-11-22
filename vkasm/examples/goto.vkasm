@@ -1,9 +1,10 @@
 	goto start
+	goto end
 
 start:
 	push 1
-loop:
-	push 1
-	addu
-	logu
-	goto loop
+	goto 1
+
+end:
+	pop
+	halt
