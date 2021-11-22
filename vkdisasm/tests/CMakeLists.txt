@@ -1,1 +1,0 @@
-add_test(NAME vkasm_main COMMAND vkasm)

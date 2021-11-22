@@ -12,5 +12,3 @@ if (NOT MSVC)
 endif()
 
 target_include_directories(vkdisasm PUBLIC ${PROJECT_BINARY_DIR})
-
-add_subdirectory("tests")
