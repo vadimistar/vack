@@ -23,6 +23,7 @@ struct Machine {
 private:
   decltype(instructions)::const_iterator m_it;
   decltype(stack)::size_type m_stackSize{0};
+  std::uint64_t instructionsExecuted{0};
 
 public:
   explicit Machine(std::vector<Instruction> &&t_instructions)

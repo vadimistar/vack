@@ -7,8 +7,8 @@
 namespace vack {
 
 struct Instruction {
-  enum struct Kind {
-    Null,
+  enum struct Kind : std::uint8_t {
+    Null = 0u,
     Nop,
     Push,
     Halt,
@@ -24,6 +24,10 @@ struct Instruction {
     Subu,
     Subf,
     Goto,
+    Dup,
+    If_Eq,
+
+    MAX,
   };
 
   Kind kind;
@@ -33,6 +37,7 @@ struct Instruction {
     switch (kind) {
     case Instruction::Kind::Push:
     case Instruction::Kind::Goto:
+    case Instruction::Kind::If_Eq:
       return 1;
     default:
       return 0;

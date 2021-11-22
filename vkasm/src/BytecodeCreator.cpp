@@ -11,14 +11,15 @@ namespace vack::vkasm {
 auto BytecodeCreator::getInstruction(std::string_view instr)
     -> Instruction::Kind {
   static const std::map<std::string_view, Instruction::Kind> t_instrKinds{
-      {"nop", Instruction::Kind::Nop},   {"push", Instruction::Kind::Push},
-      {"halt", Instruction::Kind::Halt}, {"logi", Instruction::Kind::Logi},
-      {"logu", Instruction::Kind::Logu}, {"logf", Instruction::Kind::Logf},
-      {"logp", Instruction::Kind::Logp}, {"pop", Instruction::Kind::Pop},
-      {"addi", Instruction::Kind::Addi}, {"addu", Instruction::Kind::Addu},
-      {"addf", Instruction::Kind::Addf}, {"subi", Instruction::Kind::Subi},
-      {"subu", Instruction::Kind::Subu}, {"subf", Instruction::Kind::Subf},
-      {"goto", Instruction::Kind::Goto},
+      {"nop", Instruction::Kind::Nop},     {"push", Instruction::Kind::Push},
+      {"halt", Instruction::Kind::Halt},   {"logi", Instruction::Kind::Logi},
+      {"logu", Instruction::Kind::Logu},   {"logf", Instruction::Kind::Logf},
+      {"logp", Instruction::Kind::Logp},   {"pop", Instruction::Kind::Pop},
+      {"addi", Instruction::Kind::Addi},   {"addu", Instruction::Kind::Addu},
+      {"addf", Instruction::Kind::Addf},   {"subi", Instruction::Kind::Subi},
+      {"subu", Instruction::Kind::Subu},   {"subf", Instruction::Kind::Subf},
+      {"goto", Instruction::Kind::Goto},   {"dup", Instruction::Kind::Dup},
+      {"if_eq", Instruction::Kind::If_Eq},
   };
   if (const auto it = t_instrKinds.find(instr); it != t_instrKinds.end()) {
     return it->second;
