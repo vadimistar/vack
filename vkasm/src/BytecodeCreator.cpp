@@ -8,9 +8,6 @@
 
 namespace vack::vkasm {
 
-std::uint32_t BytecodeCreator::m_instructionsTranslated{0};
-std::map<std::string, std::uint32_t> BytecodeCreator::m_labels{};
-
 auto BytecodeCreator::getInstruction(std::string_view instr)
     -> Instruction::Kind {
   static const std::map<std::string_view, Instruction::Kind> t_instrKinds{
@@ -40,8 +37,6 @@ auto BytecodeCreator::createAndWrite(std::ostream &out) -> void {
   const auto instrKind = getInstruction(tokens[0].value);
   if (instrKind == Instruction::Kind::Null) {
     if (tokens.size() == 2 && tokens[1].kind == Token::Kind::Colon) {
-      // Label
-      m_labels[tokens[0].value] = m_instructionsTranslated;
       return;
     }
     error(tokens[0].location) << "unknown instruction\n";
@@ -49,6 +44,7 @@ auto BytecodeCreator::createAndWrite(std::ostream &out) -> void {
   }
   if (const auto argsCount = Instruction{instrKind}.getArgumentsCount();
       argsCount != tokens.size() - 1) {
+    std::cout << tokens[0].value << '\n';
     error(tokens[0].location)
         << "invalid number or arguments, expected " << argsCount << ", but got "
         << tokens.size() - 1 << '\n';
@@ -75,8 +71,6 @@ auto BytecodeCreator::createAndWrite(std::ostream &out) -> void {
         static_cast<unsigned char>((value & 0xff00000000000000) >> 56);
     out << b1 << b2 << b3 << b4 << b5 << b6 << b7 << b8;
   }
-
-  ++m_instructionsTranslated;
 }
 
 auto BytecodeCreator::getVackValue(const Token &token) -> Value {
@@ -86,7 +80,7 @@ auto BytecodeCreator::getVackValue(const Token &token) -> Value {
     assert(false && "got null token while creating bytecode");
     break;
   case Token::Kind::Word:
-    if (const auto m = m_labels.find(token.value); m != m_labels.end()) {
+    if (const auto m = labelMap.find(token.value); m != labelMap.end()) {
       return m->second; 
     }
     assert(false && "forward search of labels is not implemented");

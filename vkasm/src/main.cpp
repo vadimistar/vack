@@ -81,13 +81,40 @@ auto main(int argc, char **argv) -> int {
     return std::nullopt;
   };
 
+  std::map<std::string, std::uint32_t> labels;
+  std::vector<std::vector<Token>> tokens;
+  std::uint32_t instructions{0};
+
   for (Location::Line line_number{1}; true; ++line_number) {
     const auto line = getLine();
     if (!line) {
       break;
     }
+
     Lexer lexer(line.value(), Location{line_number});
-    BytecodeCreator creator(lexer);
-    creator.createAndWrite(output_file);
+    tokens.emplace_back();
+    while (true) {
+      if (const auto t = lexer.getToken(); t.kind != Token::Kind::Null) {
+        tokens.back().emplace_back(t);
+        continue;
+      }
+      break;
+    }
+
+    if (tokens.back().size() != 0) {
+      ++instructions;
+    }
+
+    if (tokens.back().size() == 2 &&
+        tokens.back()[0].kind == Token::Kind::Word &&
+        tokens.back()[1].kind == Token::Kind::Colon) {
+      --instructions;
+      labels[tokens.back()[0].value] = instructions;
+    }
+  }
+
+  for (auto &instrTokens : tokens) {
+    BytecodeCreator bytecodeCreator(std::move(instrTokens), labels); 
+    bytecodeCreator.createAndWrite(output_file); 
   }
 }

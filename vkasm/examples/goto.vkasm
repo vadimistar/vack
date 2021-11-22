@@ -1,3 +1,6 @@
+goto start
+
+start:
 push 1
 loop:
 push 1
