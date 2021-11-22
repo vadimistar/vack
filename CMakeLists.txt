@@ -6,3 +6,4 @@ enable_testing()
 
 add_subdirectory("vack")
 add_subdirectory("vkasm")
+add_subdirectory("vkdisasm")
