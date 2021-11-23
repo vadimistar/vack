@@ -16,6 +16,7 @@ struct Instruction {
     Logu,
     Logf,
     Logp,
+    Logb,
     Pop,
     Addi,
     Addu,

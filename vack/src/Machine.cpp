@@ -71,16 +71,19 @@ void Machine::executeInstr() {
     isHalt = true;
     break;
   case Instruction::Kind::Logi:
-    std::cout << std::bit_cast<std::int64_t>(getStackTop()) << '\n';
+    std::cout << std::bit_cast<std::int64_t>(getStackTop());
     break;
   case Instruction::Kind::Logu:
-    std::cout << getStackTop() << '\n';
+    std::cout << getStackTop();
     break;
   case Instruction::Kind::Logf:
-    std::cout << std::bit_cast<std::double_t>(getStackTop()) << '\n';
+    std::cout << std::bit_cast<std::double_t>(getStackTop());
     break;
   case Instruction::Kind::Logp:
-    std::cout << std::bit_cast<void *>(getStackTop()) << '\n';
+    std::cout << std::bit_cast<void *>(getStackTop());
+    break;
+  case Instruction::Kind::Logb:
+    std::cout << static_cast<std::uint8_t>(getStackTop());
     break;
   case Instruction::Kind::Push:
     autoStackPush(instr.operand);
