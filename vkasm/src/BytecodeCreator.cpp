@@ -19,7 +19,7 @@ auto BytecodeCreator::getInstruction(std::string_view instr)
       {"addf", Instruction::Kind::Addf},   {"subi", Instruction::Kind::Subi},
       {"subu", Instruction::Kind::Subu},   {"subf", Instruction::Kind::Subf},
       {"goto", Instruction::Kind::Goto},   {"dup", Instruction::Kind::Dup},
-      {"if_eq", Instruction::Kind::If_Eq},
+      {"if_eq", Instruction::Kind::If_Eq}, {"swp", Instruction::Kind::Swp},
   };
   if (const auto it = t_instrKinds.find(instr); it != t_instrKinds.end()) {
     return it->second;

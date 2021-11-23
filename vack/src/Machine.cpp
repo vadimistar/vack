@@ -43,14 +43,12 @@ void Machine::executeInstr() {
     }
   };
 
-  const auto executeAdd = [ &getStackPop,
-                           &autoStackPush](const auto casting) {
+  const auto executeAdd = [&getStackPop, &autoStackPush](const auto casting) {
     autoStackPush(
         std::bit_cast<Value>(casting(getStackPop()) + casting(getStackPop())));
   };
 
-  const auto executeSub = [ &getStackPop,
-                           &autoStackPush](const auto casting) {
+  const auto executeSub = [&getStackPop, &autoStackPush](const auto casting) {
     const auto rhs = casting(getStackPop());
     autoStackPush(std::bit_cast<Value>(casting(getStackPop()) - rhs));
   };
@@ -121,6 +119,12 @@ void Machine::executeInstr() {
       jump(instr.operand);
     }
     break;
+  case Instruction::Kind::Swp: {
+    const auto tmp{getStackPop()};
+    const auto tmp2{getStackPop()};
+    autoStackPush(tmp);
+    autoStackPush(tmp2);
+  } break;
   default:
     assert(0 && "this kind of instruction is not handled");
   }

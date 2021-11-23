@@ -26,6 +26,7 @@ struct Instruction {
     Goto,
     Dup,
     If_Eq,
+    Swp,
 
     MAX,
   };
@@ -33,7 +34,7 @@ struct Instruction {
   Kind kind;
   Value operand{0};
 
-  auto getArgumentsCount() -> std::uint16_t {
+  auto getArgumentsCount() const -> std::uint16_t {
     switch (kind) {
     case Instruction::Kind::Push:
     case Instruction::Kind::Goto:
