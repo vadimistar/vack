@@ -1,0 +1,25 @@
+push 72   ; H
+logb
+push 101  ; e
+logb
+push 108  ; l
+logb
+dup       ; l
+logb
+push 111  ; o
+logb
+push 32   ; ' '
+logb
+push 119  ; w
+logb
+push 111  ; o
+logb
+push 114  ; r
+logb
+push 108  ; l
+logb
+push 100  ; d
+logb
+push 33   ; !
+logb
+halt
