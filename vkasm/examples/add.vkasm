@@ -5,12 +5,18 @@ addu
 logu
 pop
 
+push 32
+logb
+
 ; addi
 push -5
 push 15
 addi
 logi
 pop
+
+push 32
+logb
 
 ; addf
 push 4.5

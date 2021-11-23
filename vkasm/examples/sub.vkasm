@@ -5,11 +5,19 @@ subu
 logu
 pop
 
+push 32
+logb
+pop
+
 ; subi
 push -5
 push 15
 subi
 logi
+pop
+
+push 32
+logb
 pop
 
 ; subf

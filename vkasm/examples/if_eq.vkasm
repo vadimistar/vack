@@ -5,6 +5,10 @@ loop:
 	addu
 	logu
 
+	push 10
+	logb
+	pop
+
 	dup
 	push 10000
 	if_eq end
