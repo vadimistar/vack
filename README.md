@@ -1,6 +1,6 @@
 # Vack
 
-Vack is toy stack machine.
+Vack is a toy stack machine.
 
 ## Links:
  - [vkasm](vkasm) - assembly
@@ -9,9 +9,15 @@ Vack is toy stack machine.
 
 ## How to build:
 
+On Linux:
+
 ```bash
 mkdir build
 cd build
 cmake ..
 make
 ```
+
+On Windows:
+
+cmake-gui can be used
