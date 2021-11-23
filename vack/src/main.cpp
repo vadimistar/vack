@@ -36,7 +36,7 @@ auto main(int argc, char **argv) -> int {
     exit(1);
   }
 
-  std::uint16_t instructionsLimit = std::numeric_limits<std::uint16_t>::max();
+  std::uint64_t instructionsLimit = std::numeric_limits<std::uint64_t>::max();
 
   const auto getFilePath = [](std::string_view t_path) {
     const auto filePath = std::filesystem::path(t_path);
