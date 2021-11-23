@@ -1,3 +1,4 @@
+#include "../../vack/include/BytecodeReader.hpp"
 #include "../../vack/include/Instruction.hpp"
 
 #include <array>
@@ -23,91 +24,80 @@ auto main(int argc, char **argv) -> int {
 
   std::ifstream inf(argv[1], std::ios::binary);
 
-  if (!inf) {
-    std::cerr << "vkdisasm: ERROR: Can't open file: " << argv[1] << '\n';
-    exit(1);
-  }
-
-  std::uint8_t instrCode{0};
-  while (inf.read(reinterpret_cast<char *>(&instrCode), 1)) {
-    assert(instrCode <
-               static_cast<std::uint8_t>(vack::Instruction::Kind::MAX) &&
-           "Instr code is out of bounds");
-
+  if (inf) {
     using namespace vack;
+    BytecodeReader bytecodeReader(inf);
 
-    switch (Instruction::Kind(instrCode)) {
-    case Instruction::Kind::Null:
-    case Instruction::Kind::Nop:
-      std::cout << "nop";
-      break;
-    case Instruction::Kind::Push:
-      std::cout << "push";
-      break;
-    case Instruction::Kind::Halt:
-      std::cout << "halt";
-      break;
-    case Instruction::Kind::Logi:
-      std::cout << "logi";
-      break;
-    case Instruction::Kind::Logu:
-      std::cout << "logu";
-      break;
-    case Instruction::Kind::Logf:
-      std::cout << "logf";
-      break;
-    case Instruction::Kind::Logp:
-      std::cout << "logp";
-      break;
-    case Instruction::Kind::Pop:
-      std::cout << "pop";
-      break;
-    case Instruction::Kind::Addi:
-      std::cout << "addi";
-      break;
-    case Instruction::Kind::Addu:
-      std::cout << "addu";
-      break;
-    case Instruction::Kind::Addf:
-      std::cout << "addf";
-      break;
-    case Instruction::Kind::Subi:
-      std::cout << "subi";
-      break;
-    case Instruction::Kind::Subu:
-      std::cout << "subu";
-      break;
-    case Instruction::Kind::Subf:
-      std::cout << "subf";
-      break;
-    case Instruction::Kind::Goto:
-      std::cout << "goto";
-      break;
-    case Instruction::Kind::Dup:
-      std::cout << "dup";
-      break;
-    case Instruction::Kind::If_Eq:
-      std::cout << "if_eq";
-      break;
-    default:
-      assert(0 && "not implemented");
+    while (!bytecodeReader.isEnd()) {
+      auto instr{bytecodeReader.getInstruction()};
+
+      switch (instr.kind) {
+      case Instruction::Kind::Null:
+      case Instruction::Kind::Nop:
+        std::cout << "nop";
+        break;
+      case Instruction::Kind::Push:
+        std::cout << "push";
+        break;
+      case Instruction::Kind::Halt:
+        std::cout << "halt";
+        break;
+      case Instruction::Kind::Logi:
+        std::cout << "logi";
+        break;
+      case Instruction::Kind::Logu:
+        std::cout << "logu";
+        break;
+      case Instruction::Kind::Logf:
+        std::cout << "logf";
+        break;
+      case Instruction::Kind::Logp:
+        std::cout << "logp";
+        break;
+      case Instruction::Kind::Pop:
+        std::cout << "pop";
+        break;
+      case Instruction::Kind::Addi:
+        std::cout << "addi";
+        break;
+      case Instruction::Kind::Addu:
+        std::cout << "addu";
+        break;
+      case Instruction::Kind::Addf:
+        std::cout << "addf";
+        break;
+      case Instruction::Kind::Subi:
+        std::cout << "subi";
+        break;
+      case Instruction::Kind::Subu:
+        std::cout << "subu";
+        break;
+      case Instruction::Kind::Subf:
+        std::cout << "subf";
+        break;
+      case Instruction::Kind::Goto:
+        std::cout << "goto";
+        break;
+      case Instruction::Kind::Dup:
+        std::cout << "dup";
+        break;
+      case Instruction::Kind::If_Eq:
+        std::cout << "if_eq";
+        break;
+      case Instruction::Kind::Swp:
+        std::cout << "swp";
+        break;
+      default:
+        assert(0 && "not implemented");
+      }
+
+      if (instr.getArgumentsCount() != 0) {
+        std::cout << ' ' << instr.operand;
+      }
+      std::cout << '\n';
     }
-
-    const auto argsCount{Instruction{static_cast<Instruction::Kind>(instrCode)}
-                             .getArgumentsCount()};
-    for (auto i = 0u; i != argsCount; ++i) {
-      std::cout << ' ';
-
-      std::array<std::uint8_t, sizeof(Value) / sizeof(std::uint8_t)> bytes;
-      assert(inf.read(reinterpret_cast<char *>(&bytes),
-                      sizeof(Value) / sizeof(std::uint8_t)) &&
-             "expected value, but got end of file\n");
-
-      Value value{};
-      std::memcpy(&value, bytes.data(), sizeof(Value));
-
-      std::cout << std::hex << value;
-    }
-    std::cout << '\n';
+  } else {
+    std::cerr << "vkdisasm: ERROR: Can't open file: " << argv[1] << '\n';
+    return 1;
   }
 }
