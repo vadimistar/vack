@@ -28,6 +28,8 @@ struct Instruction {
     Dup,
     If_Eq,
     Swp,
+    Call,
+    Ret,
 
     MAX,
   };
@@ -35,11 +37,12 @@ struct Instruction {
   Kind kind;
   Value operand{0};
 
-  auto getArgumentsCount() const -> std::uint16_t {
+  [[nodiscard]] auto getArgumentsCount() const -> std::uint16_t {
     switch (kind) {
     case Instruction::Kind::Push:
     case Instruction::Kind::Goto:
     case Instruction::Kind::If_Eq:
+    case Instruction::Kind::Call: 
       return 1;
     default:
       return 0;

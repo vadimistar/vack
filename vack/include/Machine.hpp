@@ -15,7 +15,7 @@ namespace vack {
 constexpr auto stackCapacity = 1024u;
 
 struct Machine {
-  std::vector<Instruction> instructions;
+  const std::vector<Instruction> instructions;
   std::array<Value, stackCapacity> stack;
 
   bool isHalt{false};
@@ -33,6 +33,8 @@ public:
   auto getInstr() -> const auto & {
     return m_it != instructions.end() ? *(m_it++) : instructions.back();
   }
+
+  [[nodiscard]] auto getCurrentInstrIndex() const { return m_it - instructions.cbegin(); }
 
   void executeInstr();
 

@@ -128,6 +128,13 @@ void Machine::executeInstr() {
     autoStackPush(tmp);
     autoStackPush(tmp2);
   } break;
+  case Instruction::Kind::Call:
+    autoStackPush(getCurrentInstrIndex());
+    jump(instr.operand);
+    break;
+  case Instruction::Kind::Ret:
+    jump(getStackPop());   
+    break;
   default:
     assert(0 && "this kind of instruction is not handled");
   }

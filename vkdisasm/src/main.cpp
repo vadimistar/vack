@@ -29,7 +29,7 @@ auto main(int argc, char **argv) -> int {
     BytecodeReader bytecodeReader(inf);
 
     while (!bytecodeReader.isEnd()) {
-      auto instr{bytecodeReader.getInstruction()};
+      const auto instr{bytecodeReader.getInstruction()};
 
       switch (instr.kind) {
       case Instruction::Kind::Null:
@@ -86,6 +86,12 @@ auto main(int argc, char **argv) -> int {
         break;
       case Instruction::Kind::Swp:
         std::cout << "swp";
+        break;
+      case Instruction::Kind::Call:
+        std::cout << "call";
+        break;
+      case Instruction::Kind::Ret:
+        std::cout << "ret";
         break;
       default:
         assert(0 && "not implemented");
