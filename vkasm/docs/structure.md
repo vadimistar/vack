@@ -35,4 +35,4 @@ goto 1
 pop
 halt
 ```
-are identical to the stack machine, but the first one has more beautiful syntax, as labels are used there.
+are identical for the stack machine, but the first one has more beautiful syntax, as labels are used there.
