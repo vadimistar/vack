@@ -20,7 +20,8 @@ auto BytecodeCreator::getInstruction(std::string_view instr)
       {"subi", Instruction::Kind::Subi}, {"subu", Instruction::Kind::Subu},
       {"subf", Instruction::Kind::Subf}, {"goto", Instruction::Kind::Goto},
       {"dup", Instruction::Kind::Dup},   {"if_eq", Instruction::Kind::If_Eq},
-      {"swp", Instruction::Kind::Swp},
+      {"swp", Instruction::Kind::Swp},   {"call", Instruction::Kind::Call},
+      {"ret", Instruction::Kind::Ret},
   };
   if (const auto it = t_instrKinds.find(instr); it != t_instrKinds.end()) {
     return it->second;
