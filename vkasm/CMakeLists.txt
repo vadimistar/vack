@@ -7,10 +7,6 @@ project(vkasm VERSION 0.1)
 
 add_subdirectory("src")
 
-if (NOT MSVC) 
-  target_compile_options(vkasm PRIVATE -Wall -Wextra -Wshadow -Wunreachable-code -Wpedantic -fno-exceptions)
-endif()
-
 target_include_directories(vkasm PUBLIC ${PROJECT_BINARY_DIR})
 
 add_subdirectory("tests")
