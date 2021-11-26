@@ -81,12 +81,19 @@ auto main(int argc, char **argv) -> int {
       }
       BytecodeReader reader(inputFile); 
       std::vector<Instruction> instructions;
+      std::vector<RuntimeConstant> runtimeConstants;
+
+      while (!reader.isRuntimeConstantsEnd()) {
+        runtimeConstants.emplace_back(reader.getRuntimeConstant());
+      }
+
+      reader.switchToInstructions();
 
       while (!reader.isEnd()) {
         instructions.emplace_back(reader.getInstruction()); 
       } 
 
-      Machine machine{std::move(instructions)};
+      Machine machine{std::move(instructions), std::move(runtimeConstants)};
 
       while (!machine.isHalt && instructionsLimit != 0) {
         machine.executeInstr();
