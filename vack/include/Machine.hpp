@@ -7,16 +7,27 @@
 #include <array>
 #include <cstdint>
 #include <iostream>
-#include <optional>
+#include <variant>
 #include <vector>
+#include <optional>
 
 namespace vack {
 
 constexpr auto stackCapacity = 1024u;
 
+enum struct RuntimeConstantKind {
+  Value,
+  String,
+  End,
+};
+
+using RuntimeConstant = std::variant<Value, std::string, std::monostate>;
+
 struct Machine {
   const std::vector<Instruction> instructions;
   std::array<Value, stackCapacity> stack;
+
+  const std::vector<RuntimeConstant> runtimeConstants;
 
   bool isHalt{false};
 
@@ -26,15 +37,20 @@ private:
   std::uint64_t instructionsExecuted{0};
 
 public:
-  explicit Machine(std::vector<Instruction> &&t_instructions)
-      : instructions(std::move(t_instructions)), m_it(instructions.cbegin()) {}
+  Machine(std::vector<Instruction> &&t_instructions,
+          std::vector<RuntimeConstant> &&t_runtimeConstants)
+      : instructions(std::move(t_instructions)),
+        runtimeConstants(std::move(t_runtimeConstants)),
+        m_it(instructions.cbegin()) {}
 
   [[nodiscard]] auto currentInstr() const -> const auto & { return *m_it; }
   auto getInstr() -> const auto & {
     return m_it != instructions.end() ? *(m_it++) : instructions.back();
   }
 
-  [[nodiscard]] auto getCurrentInstrIndex() const { return m_it - instructions.cbegin(); }
+  [[nodiscard]] auto getCurrentInstrIndex() const {
+    return m_it - instructions.cbegin();
+  }
 
   void executeInstr();
 
