@@ -1,15 +1,15 @@
-#include "../include/Machine.hpp"
 #include "../include/BytecodeReader.hpp"
+#include "../include/Machine.hpp"
 
 #include <bit>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
+#include <cctype>
 #include <charconv>
 #include <filesystem>
 #include <numeric>
 #include <span>
-#include <cctype>
 
 auto main(int argc, char **argv) -> int {
   using namespace vack;
@@ -76,22 +76,16 @@ auto main(int argc, char **argv) -> int {
       const auto path = getFilePath(arg);
       std::ifstream inputFile(path, std::ios::binary);
       if (!inputFile) {
-        std::cerr << "vack: ERROR: Can't open file: " << path << '\n'; 
+        std::cerr << "vack: ERROR: Can't open file: " << path << '\n';
         exit(1);
       }
-      BytecodeReader reader(inputFile); 
+      BytecodeReader reader(inputFile);
       std::vector<Instruction> instructions;
-      std::vector<RuntimeConstant> runtimeConstants;
-
-      while (!reader.isRuntimeConstantsEnd()) {
-        runtimeConstants.emplace_back(reader.getRuntimeConstant());
-      }
-
-      reader.switchToInstructions();
+      std::vector<Value> runtimeConstants = reader.getRuntimeConstants();
 
       while (!reader.isEnd()) {
-        instructions.emplace_back(reader.getInstruction()); 
-      } 
+        instructions.emplace_back(reader.getInstruction());
+      }
 
       Machine machine{std::move(instructions), std::move(runtimeConstants)};
 

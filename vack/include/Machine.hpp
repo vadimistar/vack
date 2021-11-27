@@ -7,27 +7,19 @@
 #include <array>
 #include <cstdint>
 #include <iostream>
+#include <optional>
 #include <variant>
 #include <vector>
-#include <optional>
 
 namespace vack {
 
 constexpr auto stackCapacity = 1024u;
 
-enum struct RuntimeConstantKind {
-  Value,
-  String,
-  End,
-};
-
-using RuntimeConstant = std::variant<Value, std::string, std::monostate>;
-
 struct Machine {
   const std::vector<Instruction> instructions;
   std::array<Value, stackCapacity> stack;
 
-  const std::vector<RuntimeConstant> runtimeConstants;
+  const std::vector<Value> runtimeConstants;
 
   bool isHalt{false};
 
@@ -38,7 +30,7 @@ private:
 
 public:
   Machine(std::vector<Instruction> &&t_instructions,
-          std::vector<RuntimeConstant> &&t_runtimeConstants)
+          std::vector<Value> &&t_runtimeConstants)
       : instructions(std::move(t_instructions)),
         runtimeConstants(std::move(t_runtimeConstants)),
         m_it(instructions.cbegin()) {}
