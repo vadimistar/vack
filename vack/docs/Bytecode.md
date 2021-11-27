@@ -17,7 +17,7 @@ They accept [values](Values.md) as arguments.
 
 ### Format:
 ```
-<8-bit instruction code> [<[value](Values.md)>, <[value](Values.md)>, ...]
+<8-bit instruction code> [<value>, <value>, ...]
 ```
 
 Instruction code is used for determining instruction kind. Each instruction has it's own required number of arguments.
