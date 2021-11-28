@@ -1,12 +1,14 @@
 #include "../../vack/include/Instruction.hpp"
 #include "../include/BytecodeCreator.hpp"
 #include "../include/Lexer.hpp"
+#include "../include/Log.hpp"
 
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
 
+#include <bitset>
 #include <optional>
 #include <span>
 
@@ -66,8 +68,9 @@ auto main(int argc, char **argv) -> int {
         exit(1);
       }
       return path;
-    } if (!arg) {
-        return inputFilePath.replace_extension("vkbc");
+    }
+    if (!arg) {
+      return inputFilePath.replace_extension("vkbc");
     }
     printHelp();
     std::cerr << "vkasm: ERROR: Expected '-o' or end, but got " << arg.value()
@@ -85,9 +88,24 @@ auto main(int argc, char **argv) -> int {
     return std::nullopt;
   };
 
-  std::map<std::string, std::uint32_t> labels;
-  std::vector<std::vector<Token>> tokens;
-  std::uint32_t instructions{0};
+  std::map<std::string, std::size_t> labels;
+  std::vector<std::vector<Token>> instructions;
+  std::vector<vack::Value> consts;
+
+  std::bitset<2> secBits;
+
+  const auto switchSec = [&secBits](const Token &secName) {
+    secBits.reset();
+    if (secName.value == ".consts") {
+      secBits.set(0);
+    } else if (secName.value == ".code") {
+      secBits.set(1);
+    } else {
+      error(secName.location)
+          << "invalid section name. Expected '.consts' or '.code'\n";
+      exit(1);
+    }
+  };
 
   for (Location::Line line_number{1}; true; ++line_number) {
     const auto line = getLine();
@@ -96,29 +114,77 @@ auto main(int argc, char **argv) -> int {
     }
 
     Lexer lexer(line.value(), Location{line_number});
-    tokens.emplace_back();
+    std::vector<Token> tokens;
     while (true) {
       if (const auto t = lexer.getToken(); t.kind != Token::Kind::Null) {
-        tokens.back().emplace_back(t);
+        tokens.emplace_back(t);
         continue;
       }
       break;
     }
 
-    if (tokens.back().empty()) {
+    if (tokens.size() == 0) {
       continue;
-    } if (tokens.back().size() == 2 &&
-               tokens.back()[0].kind == Token::Kind::Word &&
-               tokens.back()[1].kind == Token::Kind::Colon) {
-      labels[tokens.back()[0].value] = instructions;
+    }
+
+    if (tokens.size() == 2 && tokens[0].kind == Token::Kind::Word &&
+        tokens[0].value == "sec" && tokens[1].kind == Token::Kind::Word) {
+      switchSec(tokens[1]);
+      continue;
+    }
+
+    const auto isLabel = [&tokens]() {
+      return tokens.size() == 2 && tokens[0].kind == Token::Kind::Word &&
+             tokens[1].kind == Token::Kind::Colon;
+    };
+
+    if (secBits[0] /*.consts*/) {
+      if (isLabel()) {
+        labels[tokens[0].value] = consts.size();
+      } else {
+        for (const auto t : tokens) {
+          if (t.kind == Token::Kind::Integer || t.kind == Token::Kind::Float) {
+            consts.emplace_back(BytecodeCreator::getStaticVackValue(t));
+          } else {
+            error(t.location) << "this can't be runtime const\n";
+            exit(1);
+          }
+        }
+      }
+    } else if (secBits[1] /*code*/) {
+      if (isLabel()) {
+        labels[tokens[0].value] = instructions.size();
+      } else {
+        instructions.emplace_back(tokens);
+      }
     } else {
-      ++instructions;
+      error(Location{0, 0}) << "invalid assembly section\n";
+      exit(1);
     }
   }
 
   std::vector<std::uint8_t> bytecode;
 
-  for (auto &instrTokens : tokens) {
+  bytecode.push_back(static_cast<std::uint8_t>(consts.size()));
+  for (const auto value : consts) {
+    bytecode.push_back(static_cast<unsigned char>(value & 0x00000000000000ff));
+    bytecode.push_back(
+        static_cast<unsigned char>((value & 0x000000000000ff00) >> 8));
+    bytecode.push_back(
+        static_cast<unsigned char>((value & 0x0000000000ff0000) >> 16));
+    bytecode.push_back(
+        static_cast<unsigned char>((value & 0x00000000ff000000) >> 24));
+    bytecode.push_back(
+        static_cast<unsigned char>((value & 0x000000ff00000000) >> 32));
+    bytecode.push_back(
+        static_cast<unsigned char>((value & 0x0000ff0000000000) >> 40));
+    bytecode.push_back(
+        static_cast<unsigned char>((value & 0x00ff000000000000) >> 48));
+    bytecode.push_back(
+        static_cast<unsigned char>((value & 0xff00000000000000) >> 56));
+  }
+
+  for (auto &instrTokens : instructions) {
     BytecodeCreator bytecodeCreator(std::move(instrTokens), labels);
     const auto newBytes{bytecodeCreator.create()};
     std::copy(newBytes.begin(), newBytes.end(), std::back_inserter(bytecode));
@@ -127,7 +193,7 @@ auto main(int argc, char **argv) -> int {
   const auto outputPath = generateOutputPath();
 
   if (it != args.end()) {
-    std::cerr << "vkasm: ERROR: Expected end of input, but got " << *it << '\n'; 
+    std::cerr << "vkasm: ERROR: Expected end of input, but got " << *it << '\n';
     exit(1);
   }
 
@@ -138,7 +204,5 @@ auto main(int argc, char **argv) -> int {
     exit(1);
   }
 
-  for (const auto byte : bytecode) {
-    output_file << byte;
-  }
+  output_file.write(reinterpret_cast<const char *>(bytecode.data()), sizeof(char) * bytecode.size());
 }
