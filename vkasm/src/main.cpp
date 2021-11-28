@@ -123,7 +123,7 @@ auto main(int argc, char **argv) -> int {
       break;
     }
 
-    if (tokens.size() == 0) {
+    if (tokens.empty()) {
       continue;
     }
 
@@ -142,7 +142,7 @@ auto main(int argc, char **argv) -> int {
       if (isLabel()) {
         labels[tokens[0].value] = consts.size();
       } else {
-        for (const auto t : tokens) {
+        for (const auto &t : tokens) {
           if (t.kind == Token::Kind::Integer || t.kind == Token::Kind::Float) {
             consts.emplace_back(BytecodeCreator::getStaticVackValue(t));
           } else {
