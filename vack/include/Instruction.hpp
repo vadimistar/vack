@@ -30,6 +30,7 @@ struct Instruction {
     Swp,
     Call,
     Ret,
+    Getconst,
 
     MAX,
   };
@@ -43,6 +44,7 @@ struct Instruction {
     case Instruction::Kind::Goto:
     case Instruction::Kind::If_Eq:
     case Instruction::Kind::Call: 
+    case Instruction::Kind::Getconst: 
       return 1;
     default:
       return 0;

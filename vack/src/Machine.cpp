@@ -135,8 +135,18 @@ void Machine::executeInstr() {
   case Instruction::Kind::Ret:
     jump(getStackPop());   
     break;
+  case Instruction::Kind::Getconst:
+    if (instr.operand >= runtimeConstants.size()) {
+      std::cerr << "vack: ERROR: Runtime constant index is out of bounds: "
+                << instr.operand
+                << " (size of pool: " << runtimeConstants.size() << ")\n";     
+      exit(1);
+    }
+    autoStackPush(runtimeConstants[instr.operand]);    
+    break;
   default:
-    assert(0 && "this kind of instruction is not handled");
+    std::cerr << "vack: ERROR: Unknown kind of instruction: "
+              << static_cast<int>(instr.kind) << '\n';
   }
 
   ++instructionsExecuted;
