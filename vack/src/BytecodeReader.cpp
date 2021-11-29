@@ -17,9 +17,8 @@ auto BytecodeReader::getInstruction() -> Instruction {
   Instruction instr{static_cast<Instruction::Kind>(instrByte)};
   
   for (auto i = 0u; i != instr.getArgumentsCount(); ++i) {
-    assert(i < 2 && "can't execute instructions with more than 1 arg"); 
     std::string argument(sizeof(Value), '\0');
-    if (!src.read(&argument[0], sizeof(Value))) { 
+    if (!src.read(argument.data(), sizeof(Value))) { 
       std::cerr << "Expected argument\n";      
       exit(1);
     }

@@ -1,25 +1,29 @@
-push 72   ; H
-logb
-push 101  ; e
-logb
-push 108  ; l
-logb
-dup       ; l
-logb
-push 111  ; o
-logb
-push 32   ; ' '
-logb
-push 119  ; w
-logb
-push 111  ; o
-logb
-push 114  ; r
-logb
-push 108  ; l
-logb
-push 100  ; d
-logb
-push 33   ; !
-logb
-halt
+sec .consts
+
+"Hello World!."
+
+sec .code
+
+call main
+call exit
+
+main:
+	push 0 ; 0
+	dup ; 0 0
+loop:
+	getconst ; 1 e
+	dup ; 1 e e
+	push 46 ; 1 e e .
+	if_eq exit ; 1 e e .
+	
+	logb ; 1 e
+	pop ; 1
+	addu ; 1
+	dup ; 1 1
+
+	goto loop
+	
+	ret
+
+exit:
+	halt

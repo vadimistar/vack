@@ -39,6 +39,7 @@ public:
 
   auto parseNumber() -> Token;
   auto parseWord() -> Token;
+  auto parseStringLiteral() -> Token;
 
   auto getToken() -> Token;
 

@@ -30,6 +30,7 @@ struct Instruction {
     Swp,
     Call,
     Ret,
+    Getconst,
 
     MAX,
   };

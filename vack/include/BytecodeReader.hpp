@@ -42,7 +42,7 @@ public:
   }
 
   auto getRuntimeConstants() -> std::vector<Value> {
-    std::uint16_t constsN;
+    std::uint8_t constsN;
     if (!src.read(reinterpret_cast<char *>(&constsN), sizeof(constsN))) {
       std::cerr << "ERROR: Attempt to get runtime constants while file buffer is empty\n";
       exit(1);
@@ -55,7 +55,7 @@ public:
         std::cerr << "ERROR: Reading runtime constants is failed (size of them: " << N << ")\n";
         exit(1);
       }
-      std::memcpy(&res, argument.data(), sizeof(Value) * N);
+      std::memcpy(res.data(), argument.data(), sizeof(Value) * N);
       return res;
     };
 

@@ -30,6 +30,17 @@ auto Lexer::parseWord() -> Token {
   return {Token::Kind::Word, std::string{begin_it, m_it}, begin_loc};
 }
 
+auto Lexer::parseStringLiteral() -> Token {
+  const auto begin_loc = m_loc;
+  move();
+  const auto begin_it = m_it;
+  while (!empty() && current() != '\"') {
+    move();   
+  }
+  return {Token::Kind::StringLiteral, std::string{begin_it, m_it},
+          begin_loc};
+}
+
 auto Lexer::getToken() -> Token {
   const auto skipWs = [this]() {
     while (!empty() &&
@@ -63,6 +74,8 @@ auto Lexer::getToken() -> Token {
       return parseNumber();
     case ':':
       return genToken(Token::Kind::Colon, "", m_loc);
+    case '\"':
+      return parseStringLiteral();
     default:
       if (isFirstWordSymbol(current())) {
         return parseWord();

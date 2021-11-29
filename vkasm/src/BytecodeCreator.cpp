@@ -21,7 +21,7 @@ auto BytecodeCreator::getInstruction(std::string_view instr)
       {"subf", Instruction::Kind::Subf}, {"goto", Instruction::Kind::Goto},
       {"dup", Instruction::Kind::Dup},   {"if_eq", Instruction::Kind::If_Eq},
       {"swp", Instruction::Kind::Swp},   {"call", Instruction::Kind::Call},
-      {"ret", Instruction::Kind::Ret},
+      {"ret", Instruction::Kind::Ret},   {"getconst", Instruction::Kind::Getconst},
   };
   if (const auto it = t_instrKinds.find(instr); it != t_instrKinds.end()) {
     return it->second;
@@ -98,6 +98,24 @@ auto BytecodeCreator::getVackValue(const Token &token) -> Value {
   default:
     assert(false && "not implemented");
   }
+  return Value{};
+}
+
+auto BytecodeCreator::getStaticVackValue(const Token &token) -> Value {
+  switch (token.kind) {
+  case Token::Kind::Null:
+  case Token::Kind::Word:
+  case Token::Kind::StringLiteral:
+    assert(false && "can't create value from this");
+    break;
+  case Token::Kind::Integer:
+    return std::bit_cast<Value>(std::stoll(token.value));
+  case Token::Kind::Float:
+    return std::bit_cast<Value>(std::stod(token.value));
+  default:
+    assert(false && "not implemented");
+  }
+
   return Value{};
 }
 } // namespace vack::vkasm
