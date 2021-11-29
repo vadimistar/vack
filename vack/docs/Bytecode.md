@@ -7,7 +7,7 @@ Bytecode contains of 2 sections (strongly ordered):
 ## Runtime constants
 
 Runtime constants section consists of a sequence of [values](Values.md). 
-It starts with 16-bit integer, which indicates the number of following runtime constants values.
+It starts with 8-bit integer, which indicates the number of following runtime constants values.
 Runtime constants are used for storing string literals and read-only arrays.
 
 ## Machine instructions (code)
