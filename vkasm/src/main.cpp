@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 
+#include <bitset>
 #include <optional>
 #include <span>
 
@@ -146,10 +147,6 @@ auto main(int argc, char **argv) -> int {
         for (const auto &t : tokens) {
           if (t.kind == Token::Kind::Integer || t.kind == Token::Kind::Float) {
             consts.emplace_back(BytecodeCreator::getStaticVackValue(t));
-          } else if (t.kind == Token::Kind::StringLiteral) {
-            for (const auto i : t.value) {
-              consts.emplace_back(static_cast<std::uint8_t>(i));
-            }
           } else {
             error(t.location) << "this can't be runtime const\n";
             exit(1);
@@ -163,30 +160,30 @@ auto main(int argc, char **argv) -> int {
         instructions.emplace_back(tokens);
       }
     } else {
-      assert(0 && "got into unknown section");
+      error(Location{0, 0}) << "invalid assembly section\n";
+      exit(1);
     }
   }
 
   std::vector<std::uint8_t> bytecode;
 
   bytecode.push_back(static_cast<std::uint8_t>(consts.size()));
-
-  for (const auto c : consts) {
-    bytecode.push_back(static_cast<unsigned char>(c & 0x00000000000000ff));
+  for (const auto value : consts) {
+    bytecode.push_back(static_cast<unsigned char>(value & 0x00000000000000ff));
     bytecode.push_back(
-        static_cast<unsigned char>((c & 0x000000000000ff00) >> 8));
+        static_cast<unsigned char>((value & 0x000000000000ff00) >> 8));
     bytecode.push_back(
-        static_cast<unsigned char>((c & 0x0000000000ff0000) >> 16));
+        static_cast<unsigned char>((value & 0x0000000000ff0000) >> 16));
     bytecode.push_back(
-        static_cast<unsigned char>((c & 0x00000000ff000000) >> 24));
+        static_cast<unsigned char>((value & 0x00000000ff000000) >> 24));
     bytecode.push_back(
-        static_cast<unsigned char>((c & 0x000000ff00000000) >> 32));
+        static_cast<unsigned char>((value & 0x000000ff00000000) >> 32));
     bytecode.push_back(
-        static_cast<unsigned char>((c & 0x0000ff0000000000) >> 40));
+        static_cast<unsigned char>((value & 0x0000ff0000000000) >> 40));
     bytecode.push_back(
-        static_cast<unsigned char>((c & 0x00ff000000000000) >> 48));
+        static_cast<unsigned char>((value & 0x00ff000000000000) >> 48));
     bytecode.push_back(
-        static_cast<unsigned char>((c & 0xff00000000000000) >> 56));
+        static_cast<unsigned char>((value & 0xff00000000000000) >> 56));
   }
 
   for (auto &instrTokens : instructions) {

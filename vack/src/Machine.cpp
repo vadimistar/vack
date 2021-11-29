@@ -146,7 +146,8 @@ void Machine::executeInstr() {
     autoStackPush(runtimeConstants[op]);
   } break;
   default:
-    assert(0 && "this kind of instruction is not handled");
+    std::cerr << "vack: ERROR: Unknown kind of instruction: "
+              << static_cast<int>(instr.kind) << '\n';
   }
 
   ++instructionsExecuted;
