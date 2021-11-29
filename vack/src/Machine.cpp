@@ -148,6 +148,7 @@ void Machine::executeInstr() {
   default:
     std::cerr << "vack: ERROR: Unknown kind of instruction: "
               << static_cast<int>(instr.kind) << '\n';
+    exit(1);
   }
 
   ++instructionsExecuted;
