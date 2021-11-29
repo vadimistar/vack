@@ -1,3 +1,5 @@
+sec .code
+
 ; subu
 push 3
 push 8

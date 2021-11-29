@@ -1,3 +1,5 @@
+sec .code
+
 ; addu
 push 3
 push 8

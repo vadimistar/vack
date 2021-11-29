@@ -1,3 +1,5 @@
+sec .code
+
 	goto start
 	goto end
 

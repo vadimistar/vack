@@ -1,3 +1,5 @@
+sec .code
+
 call main
 halt
 
