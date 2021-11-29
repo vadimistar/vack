@@ -147,6 +147,10 @@ auto main(int argc, char **argv) -> int {
         for (const auto &t : tokens) {
           if (t.kind == Token::Kind::Integer || t.kind == Token::Kind::Float) {
             consts.emplace_back(BytecodeCreator::getStaticVackValue(t));
+          } else if (t.kind == Token::Kind::StringLiteral) {
+            for (const auto i : t.value) {
+              consts.emplace_back(static_cast<std::uint8_t>(i));
+            }
           } else {
             error(t.location) << "this can't be runtime const\n";
             exit(1);
